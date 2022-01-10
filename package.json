@@ -1,0 +1,19 @@
+{
+  "name": "emge",
+  "version": "1.0.0",
+  "description": "EMGE web app",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "client": "cd client && npm start",
+    "dev": "concurrently \"nodemon app.js\" \"npm run client\""
+  },
+  "author": "Emoghene-Ijatomi Tejiri Stephen",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "concurrently": "^7.0.0",
+    "express": "^4.17.2",
+    "mongoose": "^6.1.6"
+  }
+}
