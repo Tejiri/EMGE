@@ -3,6 +3,10 @@ import { firebaseApp } from "../controllers/firebase";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import Header from "./Header";
 import axios from "axios";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+
+const MySwal = withReactContent(Swal);
 
 function Register() {
   const [email, setemail] = useState("");
@@ -31,8 +35,22 @@ function Register() {
                 // ...
               })
               .catch((error) => {
+                console.log(error);
                 const errorCode = error.code;
                 const errorMessage = error.message;
+                MySwal.fire({
+                  // title: "Error",
+                  titleText: errorCode,
+                  icon: "error",
+                  // footer: error.message,
+                  // didOpen: () => {
+                  //   // `MySwal` is a subclass of `Swal`
+                  //   //   with all the same instance & static methods
+                  //   MySwal.clickConfirm();
+                  // },
+                }).then(() => {
+                  // return MySwal.fire(<p>Shorthand works too</p>);
+                });
                 console.log(errorCode);
                 console.log(errorMessage);
                 seterror(errorMessage);

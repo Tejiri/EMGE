@@ -9,6 +9,16 @@ routes
   })
   .post((req, res) => {
     console.log(req.body);
+    // Expense.updateOne(
+    //   { email: req.body.email },
+    //   { $push: { spending: req.body } },
+    //   (err, doc) => {
+    //     if (err) {
+    //       console.log(err);
+    //     } else {
+    //     }
+    //   }
+    // );
   });
 
 routes.route("/register").post((req, res) => {
