@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { firebaseApp } from "../controllers/firebase";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import Header from "./Header";
+import "../styles/Register.css";
 import axios from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -18,6 +19,7 @@ function Register() {
 
       <div>
         <form
+          className="register-form-div"
           action=""
           method="post"
           onSubmit={async (event) => {
@@ -77,10 +79,11 @@ function Register() {
             }}
           />
           <input type="submit" value="Submit" />
-        </form>
-        <div>
+          <div>
           {error === "" ? null : <div style={{ color: "red" }}>{error}</div>}
         </div>
+        </form>
+       
       </div>
     </div>
   );
