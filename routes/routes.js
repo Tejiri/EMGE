@@ -4,7 +4,12 @@ const routes = express.Router();
 
 routes.route("/").post((req, res) => {
   var exists = false;
-  console.log(req.body);
+  var dataToSend = {
+    title: req.body.title,
+    date: req.body.date,
+    expenseType: req.body.expenseType,
+    amount: req.body.amount,
+  };
   Expense.findOne({ user: req.body.user }, (err, doc) => {
     for (const key in doc.spending) {
       if (
@@ -15,22 +20,27 @@ routes.route("/").post((req, res) => {
       } else {
       }
     }
-    console.log(exists);
+    // console.log(exists);
     if (exists === true) {
       let message = {
-        name: "Error",
+        name: "error",
         message: "entry already exists",
       };
       res.json(message);
     } else {
+      let message = {
+        name: "success",
+        message: "entry added",
+      };
       Expense.updateOne(
-        { email: req.body.user },
-        { $push: { spending: req.body } },
+        { user: req.body.user },
+        { $push: { spending: dataToSend } },
         (err, doc) => {
           if (err) {
             console.log(err);
           } else {
             console.log(doc);
+            res.json(message);
           }
         }
       );
@@ -38,7 +48,7 @@ routes.route("/").post((req, res) => {
   });
 });
 
-routes.route("/register").post((req, res) => {
+routes.route("/server/register").post((req, res) => {
   const data = {
     user: req.body.email,
     spending: [],
@@ -46,7 +56,7 @@ routes.route("/register").post((req, res) => {
   new Expense(data).save();
 });
 
-routes.route("/server/user").post((req, res) => {
+routes.route("/server/userinfo").post((req, res) => {
   console.log(req.body);
   Expense.findOne({ user: req.body.user }, (err, doc) => {
     if (err) {
@@ -56,6 +66,63 @@ routes.route("/server/user").post((req, res) => {
     }
   });
   // res.send("fdgdf");
+});
+
+routes.route("/expense/delete").post((req, res) => {
+  Expense.findOneAndUpdate(
+    { user: req.body.user },
+    {
+      $pull: {
+        spending: { _id: req.body.id },
+      },
+    },
+    { safe: true, upsert: true },
+    function (err, doc) {
+      if (err) {
+        res.json(err);
+      } else {
+        let message = {
+          name: "success",
+          message: "entry deleted",
+        };
+        res.json(message);
+      }
+    }
+  );
+  // console.log(req.body);
+});
+
+routes.route("/expenses/deletemany").post((req, res) => {
+  // console.log(req.body.items.length);
+  for (const key in req.body.items) {
+    // console.log(key);
+    Expense.findOneAndUpdate(
+      { user: req.body.user },
+      {
+        $pull: {
+          spending: { _id: req.body.items[key] },
+        },
+      },
+      { safe: true, upsert: true },
+      function (err, doc) {
+        if (err) {
+          res.json(err);
+        } else {
+          // console.log(req.body.items.length);
+          // console.log("" + 1);
+          if (req.body.items.length === parseInt(key) + 1) {
+            let message = {
+              name: "success",
+              message: "entries deleted",
+            };
+            res.json(message);
+          }
+        }
+      }
+    );
+  }
+
+  // console.log(req.body);
 });
 
 module.exports = routes;

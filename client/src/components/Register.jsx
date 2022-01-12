@@ -4,10 +4,7 @@ import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import Header from "./Header";
 import "../styles/Register.css";
 import axios from "axios";
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
-
-const MySwal = withReactContent(Swal);
+import { failureAlert, successAlert } from "../controllers/sweetalert";
 
 function Register() {
   const [email, setemail] = useState("");
@@ -30,9 +27,13 @@ function Register() {
                 // Signed in
                 const user = userCredential.user;
 
-                axios.post("/register", { email: email }).then((value) => {
-                  console.log(value);
-                });
+                successAlert(user.email + " has been registered");
+                seterror("");
+                axios
+                  .post("/server/register", { email: email })
+                  .then((value) => {
+                    console.log(value);
+                  });
 
                 // ...
               })
@@ -40,19 +41,7 @@ function Register() {
                 console.log(error);
                 const errorCode = error.code;
                 const errorMessage = error.message;
-                MySwal.fire({
-                  // title: "Error",
-                  titleText: errorCode,
-                  icon: "error",
-                  // footer: error.message,
-                  // didOpen: () => {
-                  //   // `MySwal` is a subclass of `Swal`
-                  //   //   with all the same instance & static methods
-                  //   MySwal.clickConfirm();
-                  // },
-                }).then(() => {
-                  // return MySwal.fire(<p>Shorthand works too</p>);
-                });
+                failureAlert(errorMessage);
                 console.log(errorCode);
                 console.log(errorMessage);
                 seterror(errorMessage);
@@ -60,6 +49,7 @@ function Register() {
               });
           }}
         >
+          <label htmlFor="">Email:</label>
           <input
             type="email"
             name=""
@@ -69,6 +59,7 @@ function Register() {
               setemail(event.target.value);
             }}
           />
+          <label htmlFor="">Password:</label>
           <input
             type="password"
             name=""
@@ -78,12 +69,11 @@ function Register() {
               setpassword(event.target.value);
             }}
           />
-          <input type="submit" value="Submit" />
+          <input type="submit" value="Register" />
           <div>
-          {error === "" ? null : <div style={{ color: "red" }}>{error}</div>}
-        </div>
+            {error === "" ? null : <div style={{ color: "red" }}>{error}</div>}
+          </div>
         </form>
-       
       </div>
     </div>
   );

@@ -2,50 +2,12 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import { DataGrid } from "@mui/x-data-grid";
-import { AccessAlarm } from "@mui/icons-material";
+import { Delete, Edit } from "@mui/icons-material";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { CircularProgress } from "@mui/material";
-
-const columns = [
-  { field: "id", headerName: "ID", width: 300 },
-  { field: "title", headerName: "Title", width: 70 },
-  { field: "date", headerName: "Date", width: 130 },
-  { field: "expenseType", headerName: "Expense Type", width: 130 },
-  {
-    field: "amount",
-    headerName: "Amount",
-    type: "number",
-    width: 90,
-  },
-  // {
-  //   field: "fullName",
-  //   headerName: "Full name",
-  //   description: "This column has a value getter and is not sortable.",
-  //   sortable: false,
-  //   width: 160,
-  //   valueGetter: (params) =>
-  //     `${params.getValue(params.id, "firstName") || ""} ${
-  //       params.getValue(params.id, "lastName") || ""
-  //     }`,
-  // },
-];
-
-// var rows = [
-//   {
-//     id: 1,
-//     lastName: "Snow",
-//     firstName: "Jon",
-//     age: 35,
-//   },
-//   { id: 2, lastName: "Lannister", firstName: "Cersei", age: 42 },
-//   { id: 3, lastName: "Lannister", firstName: "Jaime", age: 45 },
-//   { id: 4, lastName: "Stark", firstName: "Arya", age: 16 },
-//   { id: 5, lastName: "Targaryen", firstName: "Daenerys", age: null },
-//   { id: 6, lastName: "Melisandre", firstName: null, age: 150 },
-//   { id: 7, lastName: "Clifford", firstName: "Ferrara", age: 44 },
-//   { id: 8, lastName: "Frances", firstName: "Rossini", age: 36 },
-//   { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
-// ];
+import { IconButton } from "@mui/material";
+import { failureAlert } from "../controllers/sweetalert";
+import { fontWeight } from "@mui/system";
 
 function Home() {
   const [title, settitle] = useState("");
@@ -53,8 +15,9 @@ function Home() {
   const [expenseType, setexpenseType] = useState("");
   const [amount, setamount] = useState("");
   const [user, setuser] = useState("");
-  const [userInfo, setuserInfo] = useState("");
+  // const [userInfo, setuserInfo] = useState("");
   const [rows, setrows] = useState([]);
+  const [selectedexpenses, setselectedexpenses] = useState("");
 
   useEffect(() => {
     const auth = getAuth();
@@ -68,7 +31,7 @@ function Home() {
         // console.log(user);
         setuser(user.email);
         axios
-          .post("/server/user", { user: user.email })
+          .post("/server/userinfo", { user: user.email })
           .then((value) => {
             for (const key in value.data.spending) {
               let data = {
@@ -80,7 +43,7 @@ function Home() {
               };
               list.push(data);
             }
-            console.log(list);
+            // console.log(list);
             setrows(list);
             // setuserInfo(value.data);
             // console.log(value.data.spending);
@@ -97,18 +60,96 @@ function Home() {
       }
     });
   }, []);
+
+  const columns = [
+    { field: "id", headerName: "ID", width: 300 },
+    { field: "title", headerName: "Title", width: 70 },
+    { field: "date", headerName: "Date", width: 130 },
+    { field: "expenseType", headerName: "Expense Type", width: 130 },
+    {
+      field: "amount",
+      headerName: "Amount",
+      type: "number",
+      width: 90,
+    },
+    {
+      field: "delete",
+      headerName: "Delete",
+      width: 100,
+      disableClickEventBubbling: true,
+      renderCell: (params) => (
+        <IconButton
+          onClick={(event) => {
+            let data = {
+              user: user,
+              id: params.id,
+            };
+            event.ignore = true;
+            console.log(params.id);
+            axios.post("/expense/delete", data).then((value) => {
+              window.location.reload();
+              // console.log(value);
+            });
+          }}
+        >
+          <Delete />
+        </IconButton>
+      ),
+    },
+
+    {
+      field: "edit",
+      headerName: "Edit",
+      width: 100,
+      disableClickEventBubbling: true,
+      renderCell: (params) => (
+        <IconButton
+          onClick={(event) => {
+            let data = {
+              user: user,
+              id: params.id,
+            };
+            event.ignore = true;
+            console.log(params.id);
+            axios.post("/expense/delete", data).then((value) => {
+              window.location.reload();
+              // console.log(value);
+            });
+          }}
+        >
+          <Edit />
+        </IconButton>
+      ),
+    },
+    // {
+    //   field: "fullName",
+    //   headerName: "Full name",
+    //   description: "This column has a value getter and is not sortable.",
+    //   sortable: false,
+    //   width: 160,
+    //   valueGetter: (params) =>
+    //     `${params.getValue(params.id, "firstName") || ""} ${
+    //       params.getValue(params.id, "lastName") || ""
+    //     }`,
+    // },
+  ];
+
   return (
     <div>
       <Header />
       <div>
         <span>User: </span>
-        <span> {user === "" ? <CircularProgress /> : user}</span>
+        <span style={{ fontWeight: "bold" }}>
+          {" "}
+          {user === "" ? <CircularProgress /> : user}
+        </span>
       </div>
       <h2>Add Expense</h2>
       <form
         action=""
         method="post"
         onSubmit={(event) => {
+          event.preventDefault();
           let data = {
             user: user,
             title: title,
@@ -116,12 +157,15 @@ function Home() {
             expenseType: expenseType,
             amount: amount,
           };
-          event.preventDefault();
           axios
             .post("/", data)
             .then((value) => {
-              console.log(value.data);
-              window.location.reload();
+              if (value.data.name === "error") {
+                failureAlert(value.data.message);
+              } else {
+                console.log(value.data);
+                window.location.reload();
+              }
             })
             .catch((err) => {
               console.log(err);
@@ -181,16 +225,18 @@ function Home() {
           <CircularProgress />
         ) : (
           <DataGrid
-            style={{ width: "90%" }}
+            style={{ width: "100%" }}
             rows={rows}
             onSelectionModelChange={(newSelectionModel) => {
+              setselectedexpenses(newSelectionModel);
+              console.log(selectedexpenses);
               // console.log(rows);
               for (const key in newSelectionModel) {
                 // console.log(newSelectionModel[key]);
                 for (const rowKey in rows) {
                   // console.log(rows[key].id);
                   if (rows[rowKey].id === newSelectionModel[key]) {
-                    console.log(rows[key]);
+                    // console.log(rows[key]);
                   }
                 }
                 // console.log(rows[newSelectionModel[key] - 1]);
@@ -204,7 +250,24 @@ function Home() {
           />
         )}
         <div>
-          <button>Delete Selected</button>
+          <button
+          style={{margin: "30px 0px"}}
+            onClick={(event) => {
+              event.preventDefault();
+              let data = {
+                user: user,
+                items: selectedexpenses,
+              };
+              axios
+                .post("/expenses/deletemany", data)
+                .then((value) => {
+                  window.location.reload();
+                })
+                .catch((err) => {});
+            }}
+          >
+            Delete selected rows
+          </button>
         </div>
       </div>
     </div>

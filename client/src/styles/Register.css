@@ -3,4 +3,9 @@
   flex-direction: column;
   /* width: 300px; */
   place-items: center;
+  text-align: center;
+}
+
+.register-form-div > input[type=submit]{
+  margin-top: 10px;
 }

@@ -9,15 +9,15 @@ function Header() {
   return (
     <div className="header-div">
       <h3>EMGE Expenses</h3>
-      <div>
+      <div className="header-links">
         <Link to={"/"}>
-          <span>Home</span>
+          <span className="header-link">Home</span>
         </Link>
         <Link to={"/login"}>
-          <span>Login</span>
+          <span className="header-link">Login</span>
         </Link>
         <Link to={"/register"}>
-          <span>Register</span>
+          <span className="header-link">Register</span>
         </Link>
       </div>
     </div>
