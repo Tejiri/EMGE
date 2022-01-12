@@ -7,7 +7,6 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { CircularProgress } from "@mui/material";
 import { IconButton } from "@mui/material";
 import { failureAlert } from "../controllers/sweetalert";
-import { fontWeight } from "@mui/system";
 
 function Home() {
   const [title, settitle] = useState("");
