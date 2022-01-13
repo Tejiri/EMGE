@@ -6,17 +6,14 @@ const routes = require("./routes/routes");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/", routes);
+const path = require("path");
 
 app.get("*", function (req, res) {
-  
-  res.sendFile(
-    path.resolve(__dirname, "index.html"),
-    function (err) {
-      if (err) {
-        res.status(500).send(err);
-      }
+  res.sendFile(path.join(__dirname, "index.html"), function (err) {
+    if (err) {
+      res.status(500).send(err);
     }
-  );
+  });
 });
 
 const port = process.env.PORT || 8080;
@@ -27,7 +24,5 @@ mongoose.connect(
     console.log(err);
   }
 );
-
-
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
