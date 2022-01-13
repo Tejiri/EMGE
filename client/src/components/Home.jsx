@@ -7,6 +7,9 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { CircularProgress } from "@mui/material";
 import { IconButton } from "@mui/material";
 import { failureAlert } from "../controllers/sweetalert";
+import { Link, useNavigate } from "react-router-dom";
+import SecondHeader from "./SecondHeader";
+import { auth } from "../controllers/firebase";
 
 function Home() {
   const [title, settitle] = useState("");
@@ -17,10 +20,12 @@ function Home() {
   // const [userInfo, setuserInfo] = useState("");
   const [rows, setrows] = useState([]);
   const [selectedexpenses, setselectedexpenses] = useState("");
+  const navigate = useNavigate();
 
+  const logOutUser = () => {
+    navigate("/login", { replace: true });
+  };
   useEffect(() => {
-    const auth = getAuth();
-
     onAuthStateChanged(auth, (user) => {
       var list = [];
       if (user) {
@@ -53,6 +58,7 @@ function Home() {
           });
         // ...
       } else {
+        navigate("/login", { replace: true });
         console.log("User signed out");
         // User is signed out
         // ...
@@ -71,6 +77,26 @@ function Home() {
       type: "number",
       width: 90,
     },
+    
+
+    {
+      field: "edit",
+      headerName: "Edit",
+      width: 100,
+      disableClickEventBubbling: true,
+      renderCell: (params) => (
+        <IconButton
+          onClick={(event) => {
+            event.ignore = true;
+            console.log(params.id);
+            navigate("/edit/" + params.id);
+          }}
+        >
+          <Edit />
+        </IconButton>
+      ),
+    },
+
     {
       field: "delete",
       headerName: "Delete",
@@ -95,31 +121,6 @@ function Home() {
         </IconButton>
       ),
     },
-
-    {
-      field: "edit",
-      headerName: "Edit",
-      width: 100,
-      disableClickEventBubbling: true,
-      renderCell: (params) => (
-        <IconButton
-          onClick={(event) => {
-            let data = {
-              user: user,
-              id: params.id,
-            };
-            event.ignore = true;
-            console.log(params.id);
-            axios.post("/expense/delete", data).then((value) => {
-              window.location.reload();
-              // console.log(value);
-            });
-          }}
-        >
-          <Edit />
-        </IconButton>
-      ),
-    },
     // {
     //   field: "fullName",
     //   headerName: "Full name",
@@ -135,7 +136,7 @@ function Home() {
 
   return (
     <div>
-      <Header />
+      <SecondHeader />
       <div>
         <span>User: </span>
         <span style={{ fontWeight: "bold" }}>
@@ -175,6 +176,7 @@ function Home() {
           type="text"
           name="title"
           id=""
+          required
           placeholder="Title"
           onChange={(event) => {
             settitle(event.target.value);
@@ -184,6 +186,7 @@ function Home() {
           type="date"
           name="date"
           id=""
+          required
           onChange={(event) => {
             setdate(event.target.value);
           }}
@@ -192,6 +195,7 @@ function Home() {
           type="text"
           name="expenseType"
           id=""
+          required
           placeholder="Expense Type"
           onChange={(event) => {
             setexpenseType(event.target.value);
@@ -201,6 +205,7 @@ function Home() {
           type="number"
           name="amount"
           id=""
+          required
           placeholder="Amount"
           onChange={(event) => {
             setamount(event.target.value);
@@ -250,7 +255,7 @@ function Home() {
         )}
         <div>
           <button
-          style={{margin: "30px 0px"}}
+            style={{ margin: "30px 0px" }}
             onClick={(event) => {
               event.preventDefault();
               let data = {

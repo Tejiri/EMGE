@@ -1,20 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "./Header";
-import { signInWithEmailAndPassword, getAuth } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  getAuth,
+  onAuthStateChanged,
+} from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css";
 import { failureAlert } from "../controllers/sweetalert";
+import { auth } from "../controllers/firebase";
 function Login() {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
   const [error, seterror] = useState("");
   let navigate = useNavigate();
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      var list = [];
+      if (user) {
+        navigate("/", { replace: true });
+        // User is signed in, see docs for a list of available properties
+        // https://firebase.google.com/docs/reference/js/firebase.User
+        const uid = user.uid;
+        // console.log(user);
+
+        // ...
+      } else {
+      }
+    });
+  }, []);
   return (
     <div>
       <Header />
-<div>
-
-</div>
+      <div></div>
       <form
         className="login-form-div"
         action=""
@@ -30,7 +49,7 @@ function Login() {
               console.log(user);
             })
             .catch((err) => {
-              failureAlert(err.message)
+              failureAlert(err.message);
               // console.log(err);
               seterror(err.message);
             });
@@ -57,7 +76,7 @@ function Login() {
             setpassword(event.target.value);
           }}
         />
-       
+
         <input type="submit" name="" id="" value={"Login"} />
         {error === "" ? null : <div style={{ color: "red" }}>{error}</div>}
       </form>

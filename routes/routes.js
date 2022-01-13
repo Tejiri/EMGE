@@ -92,6 +92,51 @@ routes.route("/expense/delete").post((req, res) => {
   // console.log(req.body);
 });
 
+routes.route("/expenses/updateone").post((req, res) => {
+  // console.log(req.body);
+
+  Expense.findOne({ user: req.body.email }, (err, doc) => {
+    // console.log(doc);
+    for (const key in doc.spending) {
+      console.log(doc.spending[key]._id);
+      console.log(req.body.id);
+      if (doc.spending[key]._id == req.body.id) {
+        console.log("fdfddsfdsfsddisnfdsi");
+        Expense.findOneAndUpdate(
+          { user: req.body.email },
+          {
+            $set: {
+              "spending.$[key].title": req.body.title,
+              "spending.$[key].date": req.body.date,
+              "spending.$[key].expenseType": req.body.expenseType,
+              "spending.$[key].amount": req.body.amount,
+            },
+          },
+          {
+            arrayFilters: [{ "key._id": req.body.id }],
+            new: true,
+          },
+          function (err, doc) {
+            if (err) {
+              console.log(err);
+              res.json(err);
+            } else {
+              // console.log(req.body.items.length);
+              // console.log("" + 1);
+              console.log(doc);
+              let message = {
+                name: "success",
+                message: "entry updated",
+              };
+              res.json(message);
+            }
+          }
+        );
+      }
+    }
+  });
+});
+
 routes.route("/expenses/deletemany").post((req, res) => {
   // console.log(req.body.items.length);
   for (const key in req.body.items) {

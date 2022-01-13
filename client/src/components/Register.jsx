@@ -1,15 +1,37 @@
-import React, { useState } from "react";
-import { firebaseApp } from "../controllers/firebase";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import React, { useState, useEffect } from "react";
+import { auth, firebaseApp } from "../controllers/firebase";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+} from "firebase/auth";
 import Header from "./Header";
 import "../styles/Register.css";
 import axios from "axios";
 import { failureAlert, successAlert } from "../controllers/sweetalert";
+import { useNavigate } from "react-router-dom";
 
 function Register() {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
   const [error, seterror] = useState("");
+  let navigate = useNavigate();
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      var list = [];
+      if (user) {
+        navigate("/", { replace: true });
+        // User is signed in, see docs for a list of available properties
+        // https://firebase.google.com/docs/reference/js/firebase.User
+        const uid = user.uid;
+        // console.log(user);
+
+        // ...
+      } else {
+      }
+    });
+  }, []);
   return (
     <div>
       <Header />
@@ -21,7 +43,6 @@ function Register() {
           method="post"
           onSubmit={async (event) => {
             event.preventDefault();
-            const auth = getAuth();
             await createUserWithEmailAndPassword(auth, email, password)
               .then((userCredential) => {
                 // Signed in
