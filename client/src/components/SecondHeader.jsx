@@ -2,6 +2,7 @@ import { Home, Logout } from "@mui/icons-material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../controllers/firebase";
+import "../styles/SecondHeader.css";
 
 function SecondHeader() {
   const navigate = useNavigate();

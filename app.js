@@ -7,7 +7,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/", routes);
 
-const port = 8080 || process.env.PORT;
+const port = process.env.PORT || 8080;
 
 mongoose.connect(
   "mongodb+srv://Tejiri1995:Firefox1995@emge.uafzq.mongodb.net/emge?retryWrites=true&w=majority",
@@ -15,5 +15,9 @@ mongoose.connect(
     console.log(err);
   }
 );
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("client/build"));
+}
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

@@ -3,6 +3,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { auth } from "../controllers/firebase";
+import { successAlert } from "../controllers/sweetalert";
 import SecondHeader from "./SecondHeader";
 
 function Edit() {
@@ -73,7 +74,10 @@ function Edit() {
               event.preventDefault();
               axios.post("/expenses/updateone", data).then((value) => {
                 // console.log(value.data);
-                window.location.reload();
+                successAlert("Expense has been updated");
+                setTimeout(() => {
+                  window.location.reload();
+                }, 1000);
               });
             }}
           >
