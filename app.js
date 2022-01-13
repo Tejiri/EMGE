@@ -10,7 +10,7 @@ app.use("/", routes);
 app.get("*", function (req, res) {
   
   res.sendFile(
-    path.join(__dirname, "client/public/index.html"),
+    path.resolve(__dirname, "index.html"),
     function (err) {
       if (err) {
         res.status(500).send(err);
