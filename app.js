@@ -8,6 +8,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/", routes);
 const path = require("path");
 
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("client/build"));
+}
+
 app.get("*", function (req, res) {
   res.sendFile(
     path.join(__dirname, "/client/public/index.html"),
@@ -19,6 +23,7 @@ app.get("*", function (req, res) {
   );
 });
 
+
 const port = process.env.PORT || 8080;
 
 mongoose.connect(
@@ -27,5 +32,7 @@ mongoose.connect(
     console.log(err);
   }
 );
+
+
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
