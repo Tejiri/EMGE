@@ -144,7 +144,7 @@ function Home() {
           {user === "" ? <CircularProgress /> : user}
         </span>
       </div>
-      <h2>Add Expense</h2>
+      <h2>Add Expenses</h2>
       <form
         action=""
         method="post"
